@@ -1,13 +1,15 @@
 "use strict";
 
+function isNumeric (n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
 var fs = require('fs');
 var apn = require('apn');
 var express = require('express');
 var tokenStorage = require('./tokenStorage.js');
 
-function isNumeric (n) {
-  return !isNaN(parseFloat(n)) && isFinite(n);
-}
+var apnConnection = null;
 
 function startAPNConnection () {
   return new Promise(function (resolve, reject) {
@@ -21,7 +23,7 @@ function startAPNConnection () {
       interval: 300,
     };
 
-    var apnConnection = new apn.Connection(options);
+    apnConnection = new apn.Connection(options);
 
     // 通知を1つ送信しないと connected イベントが発火しない模様
     apnConnection.on('connected', () => {
@@ -37,8 +39,13 @@ function startAPNConnection () {
 function startApiServer () {
   var app = express();
 
+  app.get('/', (req, res) => {
+    res.send("hi");
+  });
+
   app.get('/notify', (req, res) => {
     var id = req.query.id;
+    var message = req.query.message;
     if (!isNumeric(id)) {
       res.sendState(403);
     }
@@ -47,17 +54,28 @@ function startApiServer () {
     notification.expiry = 1;
     notification.badge = 1234;
     notification.sound = "ping.aiff";
-    notification.alert = "見えてるか〜〜〜〜〜〜〜？？？？？？？？";
+    notification.alert = message;
 
-    var tokens = tokenStorage.getTokensById(req.query.id);
-    tokens.forEach((token) => {
-      var device = new apn.Device(token);
-      apnConnection.pushNotification(notification, device);
+    var tokens = tokenStorage.getTokensById(req.query.id, (tokens) => {
+      tokens.forEach((token) => {
+        var device = new apn.Device(token);
+        apnConnection.pushNotification(notification, device);
+      });
     });
+
+    res.send(JSON.stringify({status: "OK"}));
   });
 
   app.get('/register', (req, res) => {
-    // tokenStorage.register(req.query.
+    var id = req.query.id;
+    var token = req.query.token;
+    if (!isNumeric(id)) {
+      res.sendState(403);
+    }
+
+    tokenStorage.registerToken(id, token);
+
+    res.send("pob");
   });
 
   app.listen(3000, () => {
