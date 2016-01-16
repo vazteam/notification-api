@@ -14,8 +14,8 @@ exports.registerToken = function (id, token) {
   client.lpush(id, token);
 };
 
-exports.getTokensById = function (id) {
-  client.lrangeAsync(id, 0, -1).then(function (res) {
-    return res;
+exports.getTokensById = function (id, callback) {
+  client.lrange(id, 0, -1, (err, reply) => {
+    callback(reply);
   });
 };
