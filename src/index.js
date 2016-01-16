@@ -1,37 +1,36 @@
 "use strict";
 
-var redis = require('redis');
-var express = require('express');
+var fs = require('fs');
 var apn = require('apn');
+var express = require('express');
 var tokenStorage = require('./tokenStorage.js');
 
-function isNumeric(n) {
+function isNumeric (n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
 function startAPNConnection () {
   return new Promise(function (resolve, reject) {
+    var cert = fs.readFileSync(__dirname + "/../certs/cert.pem");
+    var key = fs.readFileSync(__dirname + "/../certs/key.pem")
     var options = {
-      // "cert": "./certs/cert.pem",
-      // "key": "./certs/key.pem",
-      "production": true,
-
-      "batchFeedback": true,
-      "interval": 300,
+      cert: cert,
+      key: key,
+      production: true,
+      batchFeedback: true,
+      interval: 300,
     };
 
     var apnConnection = new apn.Connection(options);
 
-    var feedbackOptions = {
-      "batchFeedback": true,
-      "interval": 300
-    }
-    var feedback = new apn.Feedback(feedbackOptions);
-    feedback.on("feedback", function(devices) {
-      devices.forEach(function(item) {
-        console.log(item);
-      });
+    // 通知を1つ送信しないと connected イベントが発火しない模様
+    apnConnection.on('connected', () => {
+      console.log("APN connection established");
+      resolve();
     });
+
+    // なのでとりあえず resolve() しちゃう, 接続できなかった場合は知らん
+    resolve();
   });
 }
 
@@ -48,7 +47,7 @@ function startApiServer () {
     notification.expiry = 1;
     notification.badge = 1234;
     notification.sound = "ping.aiff";
-    notification.alert = "poyo";
+    notification.alert = "見えてるか〜〜〜〜〜〜〜？？？？？？？？";
 
     var tokens = tokenStorage.getTokensById(req.query.id);
     tokens.forEach((token) => {
@@ -68,4 +67,4 @@ function startApiServer () {
 
 (function () {
   startAPNConnection().then(startApiServer);
-});
+}());
