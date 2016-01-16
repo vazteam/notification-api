@@ -10,7 +10,7 @@ function isNumeric(n) {
 }
 
 function startAPNConnection () {
-  return new Promise (resolve, reject) {
+  return new Promise(function (resolve, reject) {
     var options = {
       // "cert": "./certs/cert.pem",
       // "key": "./certs/key.pem",
@@ -32,7 +32,7 @@ function startAPNConnection () {
         console.log(item);
       });
     });
-  }
+  });
 }
 
 function startApiServer () {
