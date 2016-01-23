@@ -15,4 +15,8 @@ setTimeout(() => {
   ts.getTokensById('2', (tokens) => {
     console.log(tokens);
   });
+
+  ts.getAllTokens((tokens) => {
+    console.log(tokens);
+  });
 }, 3000);

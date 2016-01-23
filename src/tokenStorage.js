@@ -16,11 +16,11 @@ class TokenStorage {
       }
     }, 50);
 
-    this.redis.get(`token:${token}`, (err, res) => {
+    this.redis.get(`token:${token}`, (err, reply) => {
       var multi = this.redis.multi();
 
-      if (res !== null) {
-        multi.lrem(`id:${res}`, 0, token);
+      if (reply !== null) {
+        multi.lrem(`id:${reply}`, 0, token);
       }
 
       multi.lpush(`id:${id}`, token);
@@ -35,6 +35,15 @@ class TokenStorage {
   getTokensById (id, callback) {
     this.redis.lrange(`id:${id}`, 0, -1, (err, reply) => {
       callback(reply);
+    });
+  }
+
+  getAllTokens (callback) {
+    this.redis.keys(`token:*`, (err, reply) => {
+      var tokens = reply.map((key) => {
+        return key.replace('token:', '');
+      });
+      callback(tokens);
     });
   }
 }
