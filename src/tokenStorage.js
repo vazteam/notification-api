@@ -1,26 +1,49 @@
 "use strict";
 
-var redis = require('redis');
-var bluebird = require('bluebird');
+const redis = require('redis');
+const bluebird = require('bluebird');
+const EventEmitter = require('events').EventEmitter;
 
 bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);
 
-class TokenStorage {
+class TokenStorage extends EventEmitter {
   constructor () {
+    super();
+
     this.redis = redis.createClient();
+    this.registerLock = false;
   }
 
   registerToken (id, token) {
-    this.lpush(id, token);
+    var timerId = setInterval(() => {
+      if (this.registerLock === false) {
+        this.registerLock = true;
+        clearInterval(timerId);
+      }
+    }, 50);
 
+    this.redis.get(`token:${token}`, (err, res) => {
+      var multi = this.redis.multi();
+
+      if (res !== null) {
+        multi.lrem(`id:${res}`, 0, token);
+      }
+
+      multi.lpush(`id:${id}`, token);
+      multi.set(`token:${token}`, id);
+
+      multi.exec();
+    });
+
+    this.registerLock = false;
   }
 
   getTokensById (id, callback) {
-    client.lrange(id, 0, -1, (err, reply) => {
+    this.redis.lrange(`id:${id}`, 0, -1, (err, reply) => {
       callback(reply);
     });
   }
 }
 
-exports.TokenStorage = TokenStorage;
+module.exports = TokenStorage;
