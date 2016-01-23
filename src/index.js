@@ -6,9 +6,9 @@ function isNumeric (n) {
 
 var fs = require('fs');
 var express = require('express');
-var n = require('./notifier.js');
+var Notifier = require('./notifier.js');
 
-var notifier = new n.Notifier();
+var notifier = new Notifier();
 
 var app = express();
 
@@ -29,12 +29,7 @@ app.get('/notify', (req, res) => {
   notification.sound = "ping.aiff";
   notification.alert = message;
 
-  var tokens = tokenStorage.getTokensById(req.query.id, (tokens) => {
-    tokens.forEach((token) => {
-      var device = new apn.Device(token);
-      apnConnection.pushNotification(notification, device);
-    });
-  });
+  notifier.notify([id], notification);
 
   res.send(JSON.stringify({status: "OK"}));
 });
@@ -46,7 +41,7 @@ app.get('/register', (req, res) => {
     res.sendState(403);
   }
 
-  tokenStorage.registerToken(id, token);
+  notifier.register(id, token);
 
   res.send("pob");
 });

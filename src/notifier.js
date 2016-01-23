@@ -1,11 +1,11 @@
 "use strict";
 
 const apn = require('apn');
-const ts = require("./tokenStorage.js");
+const TokenStorage = require("./tokenStorage.js");
 
 class Notifier {
   constructor (){
-    this.tokenStorage = new ts.TokenStorage();
+    this.tokenStorage = new TokenStorage();
 
     var cert = fs.readFileSync(__dirname + "/../certs/cert.pem");
     var key = fs.readFileSync(__dirname + "/../certs/key.pem");
@@ -33,4 +33,4 @@ class Notifier {
   }
 }
 
-exports.Notifier = Notifier;
+exports = Notifier;
