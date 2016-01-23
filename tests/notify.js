@@ -11,4 +11,5 @@ notification.badge = 1234;
 notification.sound = "ping.aiff";
 notification.alert = "hoge";
 
-notifier.notify([1], notification);
+// notifier.notify([1], notification);
+notifier.notifyAll(notification);

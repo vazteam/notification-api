@@ -20,13 +20,25 @@ class Notifier {
     this.apnConnection = new apn.Connection(options);
   }
 
+  sendNotification(token, notification) {
+    var device = new apn.Device(token);
+    this.apnConnection.pushNotification(notification, device);
+  }
+
   notify (ids, notification) {
     ids.forEach((id) => {
-      var token = this.tokenStorage.getTokensById(id, (tokens) => {
+      this.tokenStorage.getTokensById(id, (tokens) => {
         tokens.forEach((token) => {
-          var device = new apn.Device(token);
-          this.apnConnection.pushNotification(notification, device);
+          sendNotification(token, notification);
         });
+      });
+    });
+  }
+
+  notifyAll (notification) {
+    var tokens = this.tokenStorage.getAllTokens((tokens) => {
+      tokens.forEach((token) => {
+        this.sendNotification(token, notification);
       });
     });
   }

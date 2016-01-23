@@ -7,7 +7,7 @@ function isNumeric (n) {
 var fs = require('fs');
 var apn = require('apn');
 var express = require('express');
-var bodyParser = require('body-parser')
+var bodyParser = require('body-parser');
 var Notifier = require('./notifier.js');
 
 var notifier = new Notifier();
@@ -31,6 +31,20 @@ app.post('/notify', (req, res) => {
   notification.alert = message;
 
   notifier.notify(ids, notification);
+
+  res.send(JSON.stringify({status: "OK"}));
+});
+
+app.post('/broadcast', (req, res) => {
+  var message = req.body.message;
+  var badge = req.body.badge || 0;
+
+  var notification = new apn.Notification();
+  notification.expiry = 1;
+  notification.sound = "ping.aiff";
+  notification.alert = message;
+
+  notifier.notifyAll(notification);
 
   res.send(JSON.stringify({status: "OK"}));
 });
