@@ -5,31 +5,32 @@ function isNumeric (n) {
 }
 
 var fs = require('fs');
+var apn = require('apn');
 var express = require('express');
+var bodyParser = require('body-parser')
 var Notifier = require('./notifier.js');
 
 var notifier = new Notifier();
 
 var app = express();
+app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
   res.send("hi");
 });
 
-app.get('/notify', (req, res) => {
-  var id = req.query.id;
-  var message = req.query.message;
-  if (!isNumeric(id)) {
-    res.sendState(403);
-  }
+app.post('/notify', (req, res) => {
+  var ids = req.body.ids;
+  var message = req.body.message;
+  var badge = req.body.badge || 0;
 
   var notification = new apn.Notification();
   notification.expiry = 1;
-  notification.badge = 1234;
+  notification.badge = badge;
   notification.sound = "ping.aiff";
   notification.alert = message;
 
-  notifier.notify([id], notification);
+  notifier.notify(ids, notification);
 
   res.send(JSON.stringify({status: "OK"}));
 });
