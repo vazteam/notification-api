@@ -1,4 +1,5 @@
+certs
+
 node_modules
 npm-debug.log
-
-certs
+dump.rdb
