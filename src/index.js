@@ -32,7 +32,9 @@ app.post('/notify', (req, res) => {
 
   notifier.notify(ids, notification);
 
-  res.send(JSON.stringify({status: "OK"}));
+  res.send(JSON.stringify({
+    status: "OK"
+  }));
 });
 
 app.post('/broadcast', (req, res) => {
@@ -46,7 +48,9 @@ app.post('/broadcast', (req, res) => {
 
   notifier.notifyAll(notification);
 
-  res.send(JSON.stringify({status: "OK"}));
+  res.send(JSON.stringify({
+    status: "OK"
+  }));
 });
 
 app.post('/register', (req, res) => {
@@ -58,7 +62,9 @@ app.post('/register', (req, res) => {
 
   notifier.register(id, token);
 
-  res.send("pob");
+  res.send(JSON.stringify({
+    status: "OK"
+  }));
 });
 
 app.listen(3000, () => {
