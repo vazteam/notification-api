@@ -49,9 +49,9 @@ app.post('/broadcast', (req, res) => {
   res.send(JSON.stringify({status: "OK"}));
 });
 
-app.get('/register', (req, res) => {
-  var id = req.query.id;
-  var token = req.query.token;
+app.post('/register', (req, res) => {
+  var id = req.body.id;
+  var token = req.body.token;
   if (!isNumeric(id)) {
     res.sendState(403);
   }
