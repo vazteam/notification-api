@@ -1,5 +1,6 @@
 "use strict";
 
+const fs = require('fs');
 const apn = require('apn');
 const TokenStorage = require("./tokenStorage.js");
 
@@ -22,8 +23,10 @@ class Notifier {
   notify (ids, notification) {
     ids.forEach((id) => {
       var token = this.tokenStorage.getTokensById(id, (tokens) => {
-        var device = new apn.Device(token);
-        this.apnConnection.pushNotification(notification, device);
+        tokens.forEach((token) => {
+          var device = new apn.Device(token);
+          this.apnConnection.pushNotification(notification, device);
+        });
       });
     });
   }
@@ -33,4 +36,4 @@ class Notifier {
   }
 }
 
-exports = Notifier;
+module.exports = Notifier;
