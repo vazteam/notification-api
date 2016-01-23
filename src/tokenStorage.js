@@ -23,4 +23,4 @@ class TokenStorage {
   }
 }
 
-exports.tokenStorage = TokenStorage;
+exports.TokenStorage = TokenStorage;

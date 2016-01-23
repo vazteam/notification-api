@@ -5,7 +5,7 @@ const ts = require("./tokenStorage.js");
 
 class Notifier {
   constructor (){
-    this.tokenStorage = new ts.tokenStorage();
+    this.tokenStorage = new ts.TokenStorage();
 
     var cert = fs.readFileSync(__dirname + "/../certs/cert.pem");
     var key = fs.readFileSync(__dirname + "/../certs/key.pem");
@@ -32,3 +32,5 @@ class Notifier {
     this.tokenStorage.registerToken(id, token);
   }
 }
+
+exports.Notifier = Notifier;
