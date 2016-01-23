@@ -2,15 +2,12 @@
 
 const redis = require('redis');
 const bluebird = require('bluebird');
-const EventEmitter = require('events').EventEmitter;
 
 bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);
 
-class TokenStorage extends EventEmitter {
+class TokenStorage {
   constructor () {
-    super();
-
     this.redis = redis.createClient();
     this.registerLock = false;
   }
