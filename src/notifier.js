@@ -29,7 +29,7 @@ class Notifier {
     ids.forEach((id) => {
       this.tokenStorage.getTokensById(id, (tokens) => {
         tokens.forEach((token) => {
-          sendNotification(token, notification);
+          this.sendNotification(token, notification);
         });
       });
     });
