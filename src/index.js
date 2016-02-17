@@ -23,12 +23,13 @@ app.post('/notify', (req, res) => {
   var ids = req.body.ids;
   var message = req.body.message;
   var badge = req.body.badge || 0;
+  var sound = req.body.sound || "ping.aiff";
   var payload = req.body.payload || {};
 
   var notification = new apn.Notification();
   notification.expiry = 1;
   notification.badge = badge;
-  notification.sound = "ping.aiff";
+  notification.sound = sound;
   notification.alert = message;
   notification.payload = payload;
 
@@ -42,7 +43,8 @@ app.post('/notify', (req, res) => {
 app.post('/broadcast', (req, res) => {
   var message = req.body.message;
   var badge = req.body.badge || 0;
-  var payload = req.body.payload;
+  var sound = req.body.sound || "ping.aiff";
+  var payload = req.body.payload || {};
 
   var notification = new apn.Notification();
   notification.expiry = 1;
