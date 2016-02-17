@@ -3,6 +3,7 @@
 const fs = require('fs');
 const apn = require('apn');
 const TokenStorage = require("./tokenStorage.js");
+const winston = require('winston');
 
 class Notifier {
   constructor (){
@@ -10,14 +11,22 @@ class Notifier {
 
     var cert = fs.readFileSync(__dirname + "/../certs/cert.pem");
     var key = fs.readFileSync(__dirname + "/../certs/key.pem");
-    var options = {
+    var connectionOptions = {
       cert: cert,
       key: key,
       production: true,
-      batchFeedback: true,
-      interval: 300,
     };
-    this.apnConnection = new apn.Connection(options);
+    this.apnConnection = new apn.Connection(connectionOptions);
+    this.apnConnection.on('transmissionError', this.transmissionError);
+
+    var feedbackOptions = {
+      cert: cert,
+      key: key,
+      batchFeedback: true,
+      interval: 300
+    };
+    var feedback = new apn.Feedback(feedbackOptions);
+    feedback.on("feedback", this.feedback);
   }
 
   sendNotification(token, notification) {
@@ -29,10 +38,12 @@ class Notifier {
     ids.forEach((id) => {
       this.tokenStorage.getTokensById(id, (tokens) => {
         tokens.forEach((token) => {
+          winston.debug(`Token: ${token}`);
           this.sendNotification(token, notification);
         });
       });
     });
+    winston.info(`ids: ${ids.join(', ')}`);
   }
 
   notifyAll (notification) {
@@ -45,6 +56,15 @@ class Notifier {
 
   register (id, token) {
     this.tokenStorage.registerToken(id, token);
+  }
+
+  transmissionError (errCode, notification, device) {
+    var token = device.token.toString('hex')
+    winston.error(`Notification caused error: ${errCode} (Device token: ${token})`);
+  }
+
+  feedback (devices) {
+    console.log(devices);
   }
 }
 
