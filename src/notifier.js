@@ -4,6 +4,7 @@ const fs = require('fs');
 const apn = require('apn');
 const TokenStorage = require("./tokenStorage.js");
 const winston = require('winston');
+winston.add(winston.transports.File, { filename: 'logs/notifier.log' });
 
 class Notifier {
   constructor (){
