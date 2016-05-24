@@ -31,8 +31,13 @@ class Notifier {
   }
 
   sendNotification(token, notification) {
-    var device = new apn.Device(token);
-    this.apnConnection.pushNotification(notification, device);
+    try {
+      var device = new apn.Device(token);
+      this.apnConnection.pushNotification(notification, device);
+    } catch (err) {
+      winston.error(`Fatal error (Device token: ${token})`);
+      console.log(err);
+    }
   }
 
   notify (ids, notification) {
