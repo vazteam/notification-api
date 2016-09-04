@@ -3,8 +3,14 @@
 const redis = require('redis');
 
 class TokenStorage {
-  constructor () {
+  constructor(config) {
     this.redis = redis.createClient();
+    this.config = config || {};
+
+    // Redis のキーにつく Prefix (`dev-` であれば `dev-id` のようなキーが生成される)
+    this.redisPrefix = this.config.redisPrefix || '';
+
+    // Register 処理をする際のロック    
     this.registerLock = false;
   }
 
@@ -16,15 +22,15 @@ class TokenStorage {
       }
     }, 50);
 
-    this.redis.get(`token:${token}`, (err, reply) => {
+    this.redis.get(`${this.redisPrefix}token:${token}`, (err, reply) => {
       var multi = this.redis.multi();
 
       if (reply !== null) {
-        multi.lrem(`id:${reply}`, 0, token);
+        multi.lrem(`${this.redisPrefix}id:${reply}`, 0, token);
       }
 
-      multi.lpush(`id:${id}`, token);
-      multi.set(`token:${token}`, id);
+      multi.lpush(`${this.redisPrefix}id:${id}`, token);
+      multi.set(`${this.redisPrefix}token:${token}`, id);
 
       multi.exec();
     });
@@ -33,15 +39,15 @@ class TokenStorage {
   }
 
   getTokensById (id, callback) {
-    this.redis.lrange(`id:${id}`, 0, -1, (err, reply) => {
+    this.redis.lrange(`${this.redisPrefix}id:${id}`, 0, -1, (err, reply) => {
       callback(reply);
     });
   }
 
   getAllTokens (callback) {
-    this.redis.keys(`token:*`, (err, reply) => {
+    this.redis.keys(`${this.redisPrefix}token:*`, (err, reply) => {
       var tokens = reply.map((key) => {
-        return key.replace('token:', '');
+        return key.replace(`${this.redisPrefix}token:`, '');
       });
       callback(tokens);
     });
