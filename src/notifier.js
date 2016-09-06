@@ -40,18 +40,29 @@ class Notifier {
     }
   }
 
-  notify (ids, notification) {
+  notify(ids, notification, incrementBadge) {
+    if (incrementBadge === undefined) { incrementBadge = false; }
+
     ids.forEach((id) => {
-      this.tokenStorage.incrBadgeCount(id).then((badgeCount) => {
-        notification.badge = badgeCount;
-        console.log(badgeCount);
+      if (incrementBadge) {
+        this.tokenStorage.incrBadgeCount(id).then((badgeCount) => {
+          notification.badge = badgeCount;
+          this.tokenStorage.getTokensById(id, (tokens) => {
+            tokens.forEach((token) => {
+              winston.debug(`Token: ${token}`);
+              this.sendNotification(token, notification);
+            });
+          });
+        });
+      }
+      else {
         this.tokenStorage.getTokensById(id, (tokens) => {
           tokens.forEach((token) => {
             winston.debug(`Token: ${token}`);
             this.sendNotification(token, notification);
           });
         });
-      });  
+      }
     });
     winston.info(`ids: ${ids.join(', ')}`);
   }

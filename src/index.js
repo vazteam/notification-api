@@ -26,6 +26,8 @@ app.post('/notify', (req, res) => {
   var sound = req.body.sound || "ping.aiff";
   var payload = req.body.payload || {};
 
+  var incrementBadge = !req.body.noIncrementBadge;
+
   var notification = new apn.Notification();
   notification.expiry = 1;
   notification.badge = badge;
@@ -33,7 +35,7 @@ app.post('/notify', (req, res) => {
   notification.alert = message;
   notification.payload = payload;
 
-  notifier.notify(ids, notification);
+  notifier.notify(ids, notification, incrementBadge);
 
   res.send(JSON.stringify({
     status: "OK"
@@ -46,13 +48,15 @@ app.post('/broadcast', (req, res) => {
   var sound = req.body.sound || "ping.aiff";
   var payload = req.body.payload || {};
 
+  var incrementBadge = !req.body.noIncrementBadge;
+
   var notification = new apn.Notification();
   notification.expiry = 1;
   notification.sound = "ping.aiff";
   notification.alert = message;
   notification.payload = payload;
 
-  notifier.notifyAll(notification);
+  notifier.notifyAll(notification, incrementBadge);
 
   res.send(JSON.stringify({
     status: "OK"

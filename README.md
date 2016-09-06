@@ -29,7 +29,8 @@ Sample Request:
   "badge": 100,
   "payload": {
     "some-key": "some-value"
-  }
+  },
+  "noIncrementBadge": false  // badge を +1 しない
 }
 ```
 `badge` は指定しなくてもいい。1つのIDだけに送信する場合でも `"ids": [1]` のように
