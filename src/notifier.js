@@ -15,7 +15,7 @@ class Notifier {
     var connectionOptions = {
       cert: cert,
       key: key,
-      production: true,
+      production: false,
     };
     this.apnConnection = new apn.Connection(connectionOptions);
     this.apnConnection.on('transmissionError', this.transmissionError);
@@ -42,12 +42,16 @@ class Notifier {
 
   notify (ids, notification) {
     ids.forEach((id) => {
-      this.tokenStorage.getTokensById(id, (tokens) => {
-        tokens.forEach((token) => {
-          winston.debug(`Token: ${token}`);
-          this.sendNotification(token, notification);
+      this.tokenStorage.incrBadgeCount(id).then((badgeCount) => {
+        notification.badge = badgeCount;
+        console.log(badgeCount);
+        this.tokenStorage.getTokensById(id, (tokens) => {
+          tokens.forEach((token) => {
+            winston.debug(`Token: ${token}`);
+            this.sendNotification(token, notification);
+          });
         });
-      });
+      });  
     });
     winston.info(`ids: ${ids.join(', ')}`);
   }
@@ -62,6 +66,10 @@ class Notifier {
 
   register (id, token) {
     this.tokenStorage.registerToken(id, token);
+  }
+
+  clearBadgeCount(id) {
+    this.tokenStorage.clearBadgeCount(id);
   }
 
   transmissionError (errCode, notification, device) {

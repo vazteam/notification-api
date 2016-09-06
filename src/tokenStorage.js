@@ -38,6 +38,18 @@ class TokenStorage {
     this.registerLock = false;
   }
 
+  incrBadgeCount(id) {
+    return new Promise((resolve, reject) => {
+      this.redis.incr(`${this.redisPrefix}id-badges:${id}`, (err, reply) => {
+        resolve(reply);
+      });
+    });
+  }
+
+  clearBadgeCount(id) {
+    this.redis.del(`${this.redisPrefix}id-badges:${id}`);
+  }
+
   getTokensById (id, callback) {
     this.redis.lrange(`${this.redisPrefix}id:${id}`, 0, -1, (err, reply) => {
       callback(reply);

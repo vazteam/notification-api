@@ -73,6 +73,15 @@ app.post('/register', (req, res) => {
   }));
 });
 
+app.post('/clearBadgeCount', (req, res) => {
+  var id = req.body.id;
+  notifier.clearBadgeCount(id);
+
+  res.send(JSON.stringify({
+    status: "OK"
+  }));
+});
+
 app.listen(3000, () => {
   console.log('Notification API Server listening on port 3000');
 });

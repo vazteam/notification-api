@@ -53,3 +53,13 @@ Sample Request:
 ```
 curl -v -XPOST 'http://localhost:3000/broadcast' -H "Content-Type: application/json" -d'{"message": "This is nott PHP", "badge": 333}'
 ```
+
+### POST `/clearBadgeCount`
+指定した id の badge を 0 に戻す。
+
+Sample Request:
+```
+{
+  "id": 1
+}
+```
