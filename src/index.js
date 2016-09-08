@@ -81,6 +81,12 @@ app.post('/clearBadgeCount', (req, res) => {
   var id = req.body.id;
   notifier.clearBadgeCount(id);
 
+  var notification = new apn.Notification();
+  notification.expiry = 1;
+  notification.badge = 0;
+
+  notifier.notify([id], notification, false);
+
   res.send(JSON.stringify({
     status: "OK"
   }));
